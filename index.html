@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>じゅうにコミュニティ — Metrics</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg: #0b0d10;
+      --fg: #e8ecf1;
+      --muted: #a7b0bb;
+      --accent: #7bc4ff;
+      --card: rgba(255,255,255,0.06);
+      --blur: 10px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, "Noto Sans JP", Arial, sans-serif;
+      color: var(--fg);
+      background: var(--bg);
+      letter-spacing: .01em;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+      overscroll-behavior-y: contain;
+      scroll-snap-type: y mandatory;
+    }
+    section.panel{
+      position: relative;
+      height: 100svh; /* mobile safe viewport */
+      min-height: 540px;
+      display: grid;
+      place-items: center;
+      padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      isolation: isolate;
+    }
+    .wrap{width:100%;max-width: 960px; margin: 0 auto;}
+
+    h1,h2{margin:0 0 .5rem 0;line-height:1.15}
+    h1{font-size: clamp(28px, 6.5vw, 56px); font-weight: 800;}
+    h2{font-size: clamp(22px, 5.6vw, 40px); font-weight: 800;}
+    p.lead{margin:.4rem 0 1.2rem 0;color:var(--muted);font-size: clamp(14px,3.6vw,18px)}
+
+    .hero{
+      display:flex;flex-direction:column;gap:10px;align-items:flex-start;
+      backdrop-filter: blur(var(--blur));
+      background: linear-gradient( to bottom right, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      padding: 20px 16px 16px 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+    .hero .badge{display:inline-flex;align-items:center;gap:8px;color:#cbe6ff;background:rgba(123,196,255,.12);border:1px solid rgba(123,196,255,.35);padding:6px 10px;border-radius:999px;font-size:12px}
+    .hero .days{font-size: clamp(18px,4.5vw,24px);color:var(--fg)}
+
+    .scroll-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:12px;color:var(--muted);opacity:.9;display:flex;align-items:center;gap:6px}
+    .scroll-hint .dot{width:6px;height:6px;border-radius:999px;background:var(--muted);animation: blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+
+    /* Panel 2 background map */
+    .map-bg{
+      position:absolute;inset:0;z-index:-1;overflow:hidden;border-radius:0;
+    }
+    .map-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter: blur(6px) brightness(.7) saturate(1.1); transform: scale(1.04);}
+    .map-overlay{position:absolute;inset:0;background: radial-gradient(80% 65% at 50% 40%, rgba(10,12,15,0) 0%, rgba(10,12,15,.40) 60%, rgba(10,12,15,.75) 100%)}
+
+    .metrics{ display:grid;grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; margin-top: 16px; }
+    @media (min-width: 720px){ .metrics{grid-template-columns: repeat(2, minmax(0,1fr)); gap:20px} }
+
+    .metric{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding: 18px 16px;
+      min-height: 140px;
+      display:flex;flex-direction:column;justify-content:center;align-items:flex-start;
+    }
+    .metric .number{font-size: clamp(28px, 8vw, 54px); font-weight: 800; line-height:1;} 
+    .metric .label{margin-top:6px;font-size: clamp(12px,3.5vw,14px); color: var(--muted)}
+
+    /* Accessibility: reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      .map-bg img{filter: blur(8px) brightness(.6)}
+      .scroll-hint{display:none}
+    }
+  </style>
+</head>
+<body>
+  <!-- Panel 1: Intro / Since & Days -->
+  <section class="panel" id="intro">
+    <div class="wrap">
+      <div class="hero">
+        <span class="badge">じゅうにコミュニティ</span>
+        <h1>世界にひろがる、クリエイターの輪</h1>
+        <p class="lead">2022年2月4日 開設</p>
+        <div class="days" aria-live="polite">運営 <strong id="days-running">—</strong> 日目</div>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><span class="dot"></span> スクロール</div>
+  </section>
+
+  <!-- Panel 2: Scale (with blurred map background) -->
+  <section class="panel" id="scale">
+    <div class="map-bg">
+      <!-- ぼかし背景: 同じフォルダに output.jpg を置いてください -->
+      <img src="output.jpg" alt="参加国の分布マップ背景" loading="lazy" />
+      <div class="map-overlay"></div>
+    </div>
+    <div class="wrap">
+      <h2>圧倒的なスケール</h2>
+      <p class="lead">コミュニティの広がりを、数字で。</p>
+      <div class="metrics">
+        <div class="metric">
+          <div class="number"><span class="count" data-target="1" data-duration="1200"></span><span class="suffix">位</span></div>
+          <div class="label">国内（日本のイラストコミュニティ）</div>
+        </div>
+        <div class="metric">
+          <div class="number"><span class="count" data-target="30" data-plus="+" data-duration="1200"></span></div>
+          <div class="label">参加国・地域</div>
+        </div>
+        <div class="metric">
+          <div class="number"><span class="count" data-target="27000" data-plus="+" data-duration="1600"></span></div>
+          <div class="label">メンバー</div>
+        </div>
+        <div class="metric">
+          <div class="number"><span class="count" data-target="200000" data-plus="+" data-duration="1800"></span></div>
+          <div class="label">累計参加者</div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><span class="dot"></span> スクロール</div>
+  </section>
+
+  <!-- Panel 3: Activity -->
+  <section class="panel" id="activity">
+    <div class="wrap">
+      <h2>アクティブなコミュニティ</h2>
+      <p class="lead">日々の活動が数値に現れる。</p>
+      <div class="metrics">
+        <div class="metric">
+          <div class="number"><span class="count" data-target="240000" data-plus="+" data-duration="1400"></span></div>
+          <div class="label">投稿ツイート</div>
+        </div>
+        <div class="metric">
+          <div class="number"><span class="count" data-target="3800000" data-plus="+" data-duration="1700"></span></div>
+          <div class="label">いいね</div>
+        </div>
+        <div class="metric">
+          <div class="number"><span class="count" data-target="32000" data-plus="+" data-duration="1500"></span></div>
+          <div class="label">コメント</div>
+        </div>
+        <div class="metric">
+          <div class="number"><span class="count" data-target="180000000" data-plus="+" data-duration="2000"></span></div>
+          <div class="label">インプレッション</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // === 運営日数（JST基準で毎日更新） ===
+    (function(){
+      const start = Date.parse('2022-02-04T00:00:00+09:00'); // JST の開始時刻
+      const now = Date.now();
+      const days = Math.floor((now - start) / 86400000) + 1; // 初日を 1 日目として数える
+      const el = document.getElementById('days-running');
+      if(el) el.textContent = days.toLocaleString('ja-JP');
+    })();
+
+    // === 数値カウンター（ビューポートに入ったら 1 から急加速でカウント） ===
+    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+    function animateCount(el){
+      const target = parseInt(el.dataset.target, 10) || 0;
+      const plus = el.dataset.plus || '';
+      const duration = parseInt(el.dataset.duration, 10) || 1200;
+      const start = 1;
+      const startTime = performance.now();
+
+      function step(now){
+        const t = Math.min(1, (now - startTime) / duration);
+        const eased = easeOutCubic(t);
+        const val = Math.max(1, Math.round(start + (target - start) * eased));
+        el.textContent = val.toLocaleString('ja-JP') + plus;
+        if(t < 1) requestAnimationFrame(step);
+      }
+      // prefers-reduced-motion: アニメーションをスキップ
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if(mq.matches){ el.textContent = target.toLocaleString('ja-JP') + plus; return; }
+      requestAnimationFrame(step);
+    }
+
+    // 1 度だけ起動する IntersectionObserver
+    const observer = new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          const el = entry.target;
+          animateCount(el);
+          obs.unobserve(el);
+        }
+      })
+    }, {threshold: 0.4, rootMargin: '0px 0px -10% 0px'});
+
+    document.querySelectorAll('.count').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
